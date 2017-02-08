@@ -1,5 +1,5 @@
 var height = 300
-var width = 500
+var width = 800
 
 var svg = d3.select('body')
 			.append('svg')
@@ -25,7 +25,10 @@ var svgBalls = svg
 			.enter()
 			.append('circle')
 			.attr('r', 10)
-			.attr('fill', 'orange')
+			// make all colors the same after testing
+			.attr('fill', function(d, i){
+				return d[i] ? 'yellow' : 'orange'
+			})
 
 svgBalls
 		    .call(d3.drag()
@@ -68,14 +71,112 @@ function dragended(d) {
 }
 
 function useScales(){
-	console.log("Using scales")
-	svgBalls
-		.filter(function(d){
-			return d.x > 250
-		})
-		.style("fill", "red")
-		.transition()
-			.duration(500)
-			.attr("transform", "translate(0, -100)")
+	var inTheRightScale = false;
+	var inTheLeftScale = false;
+
+	var onLeft = svgBalls
+			.filter(function(d, i){
+				if(d.x > 100 && d.x < 180 && d[i] === true){
+					inTheLeftScale = true
+				}
+				return d.x > 100 && d.x < 180
+			})
+
+	var onRight = svgBalls
+			.filter(function(d, i){
+				if(d.x > 240 && d.x < 320 && d[i] === true){
+					inTheRightScale = true
+				}
+				return d.x > 240 && d.x < 320
+			})
+
+	if(inTheLeftScale){
+		leftScales
+			.transition()
+				.duration(500)
+				.attr("transform", "translate(0, -90)")
+
+		rightScales
+			.transition()
+				.duration(500)
+				.attr("transform", "translate(0, -110)")
+
+		onLeft
+			.transition()
+				.duration(500)
+				.attr("transform", "translate(0, -90)")
+
+		onRight
+			.transition()
+				.duration(500)
+				.attr("transform", "translate(0, -110)")
+
+	}
+
+	if(inTheRightScale){
+		leftScales
+			.transition()
+				.duration(500)
+				.attr("transform", "translate(0, -110)")
+
+		rightScales
+			.transition()
+				.duration(500)
+				.attr("transform", "translate(0, -90)")
+
+		onLeft
+			.transition()
+				.duration(500)
+				.attr("transform", "translate(0, -110)")
+
+		onRight
+			.transition()
+				.duration(500)
+				.attr("transform", "translate(0, -90)")
+
+	}
+		console.log("Is in left? ", inTheLeftScale)
+		console.log("Is in right? ", inTheRightScale)
+
 }
 
+function isThere(b){
+
+	b.forEach( ball => console.log(ball) )
+}
+
+var rightScalesCoordinartes = [[{x: 340, y:250}, {x: 420, y:250}, {x:410,y:260}, {x:350,y:260}]];
+
+var d3DataRightScales = rightScalesCoordinartes.map(function(point){
+    return point.reduce(function(s, n){return s + ', ' + n.x + ',' + n.y}, '').substr(2)
+});
+
+var rightScales = svg.append('g')
+
+rightScales
+	.selectAll("polygon")
+    .data(d3DataRightScales)
+    .enter()
+    .append("polygon")
+    .style("stroke", "#FFFCD3")
+    .style("fill", '"orange')
+    .attr("points", (d) =>{ return d});
+
+var leftScalesCoordinartes = [[{x: 190, y:250}, {x: 270, y:250}, {x:260,y:260}, {x:200,y:260}]];
+
+var d3DataLeftScales = leftScalesCoordinartes.map(function(point){
+    return point.reduce(function(s, n){return s + ', ' + n.x + ',' + n.y}, '').substr(2)
+});
+
+var leftScales = svg.append('g')
+
+leftScales
+	.selectAll("polygon")
+    .data(d3DataLeftScales)
+    .enter()
+    .append("polygon")
+    .style("stroke", "#FFFCD3")
+    .style("fill", '"orange')
+    .attr("points", (d) =>{ return d});
+
+console.log(balls)
