@@ -26,15 +26,6 @@ var svgBalls = svg
 			.append('circle')
 			.attr('r', 10)
 			.attr('fill', 'orange')
-			.attr("cx", function(d, i){
-				return Math.random()*200 + 50
-			})
-
-svgBalls
-			.transition()
-				.duration(1000)
-				// .ease(d3.easeBounceOut)
-				// .attr("cy", height-50)
 
 svgBalls
 		    .call(d3.drag()
@@ -42,10 +33,7 @@ svgBalls
 		        .on("drag", dragged)
 		        .on("end", dragended));
 
-repelForce = d3.forceManyBody().distanceMin(1);
-
 var simulation = d3.forceSimulation(balls)
-			// .force('repel', repelForce)
 			.force("collide", d3.forceCollide().radius(10))
 			.force('y', d3.forceY(250).strength(0.3))
 
@@ -58,10 +46,9 @@ var ticked = function() {
 simulation
 	.on("tick", ticked);
 
-
-
 function dragstarted(d) {
-	if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+	simulation.restart();
+    simulation.alpha(1.0);
 	d3.select(this)
 		.raise()
 		.classed("active", true);
@@ -74,7 +61,21 @@ function dragged(d) {
 }
 
 function dragended(d) {
-	if (!d3.event.active) simulation.alphaTarget(0.5);
+
 	d3.select(this)
 		.classed("active", false);
+	simulation.alphaTarget(0.1);
 }
+
+function useScales(){
+	console.log("Using scales")
+	svgBalls
+		.filter(function(d){
+			return d.x > 250
+		})
+		.style("fill", "red")
+		.transition()
+			.duration(500)
+			.attr("transform", "translate(0, -100)")
+}
+
