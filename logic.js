@@ -21,7 +21,22 @@ var svg = d3.select('body')
 var canvas = svg.append('rect')
 			.attr('width', '100%')
 			.attr('height', '100%')
-			.attr('fill', 'blue')
+			.attr('fill', '#2B2B2B')
+// ----------------------------------------------------------------------------------------------
+// -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+//---------------------------------GRADIENT COLORS-----------------------------------------------
+
+var defs = svg.append("defs")
+var steel = defs.append("radialGradient").attr('id', 'metal')
+var copper = defs.append("radialGradient").attr('id', 'copper')
+
+steel.append("stop").attr("offset", "0%").style("stop-color", "white");
+steel.append("stop").attr("offset", "100%").style("stop-color", "#7b899b");
+
+copper.append("stop").attr("offset", "0%").style("stop-color", "white");
+copper.append("stop").attr("offset", "100%").style("stop-color", "#b87333");
+
 // ----------------------------------------------------------------------------------------------
 // -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
@@ -40,9 +55,9 @@ var svgBalls = svg
 			.enter()
 			.append('circle')
 			.attr('r', 10)
-			// make all colors the same after testing
+			// make all colors the same after testing -----!!!!!!!
 			.attr('fill', function(d, i){
-				return d[i] ? 'yellow' : 'orange'
+				return d[i] ? 'yellow' : 'url(#metal)'
 			})
 
 svgBalls
@@ -96,6 +111,11 @@ function dragended(d) {
 
 // ----------------------------------- USING SCALES --------------------------------------------
 function useScales(){
+	message[1] = parseInt(message[1])-1;
+	legend.data(message).text(function(d){return d;})
+
+	var text = d3.selectAll('text').data(message)
+	console.log(parseInt(message[1]))
 	var inTheRightScale = false;
 	var inTheLeftScale = false;
 
@@ -124,73 +144,88 @@ function useScales(){
 				return d.x > 240 && d.x < 320
 			})
 
-	if(inTheLeftScale){
-		leftScales
-			.transition()
-				.duration(500)
-				.attr("transform", "translate(0, -90)")
+	function skewLeft(){
+			leftScales
+				.transition()
+					.duration(500)
+					.attr("transform", "translate(0, -90)")
 
-		rightScales
-			.transition()
-				.duration(500)
-				.attr("transform", "translate(0, -110)")
+			rightScales
+				.transition()
+					.duration(500)
+					.attr("transform", "translate(0, -110)")
 
-		onLeft
-			.transition()
-				.duration(500)
-				.attr("transform", "translate(0, -90)")
+			onLeft
+				.transition()
+					.duration(500)
+					.attr("transform", "translate(0, -90)")
 
-		onRight
-			.transition()
-				.duration(500)
-				.attr("transform", "translate(0, -110)")
-
-	}
-	else if(inTheRightScale){
-		leftScales
-			.transition()
-				.duration(500)
-				.attr("transform", "translate(0, -110)")
-
-		rightScales
-			.transition()
-				.duration(500)
-				.attr("transform", "translate(0, -90)")
-
-		onLeft
-			.transition()
-				.duration(500)
-				.attr("transform", "translate(0, -110)")
-
-		onRight
-			.transition()
-				.duration(500)
-				.attr("transform", "translate(0, -90)")
+			onRight
+				.transition()
+					.duration(500)
+					.attr("transform", "translate(0, -110)")
 
 	}
-	else{
-		leftScales
-			.transition()
-				.duration(500)
-				.attr("transform", "translate(0, -100)")
 
-		rightScales
-			.transition()
-				.duration(500)
-				.attr("transform", "translate(0, -100)")
+	function skewRight(){
+			leftScales
+				.transition()
+					.duration(500)
+					.attr("transform", "translate(0, -110)")
 
-		onLeft
-			.transition()
-				.duration(500)
-				.attr("transform", "translate(0, -100)")
+			rightScales
+				.transition()
+					.duration(500)
+					.attr("transform", "translate(0, -90)")
 
-		onRight
-			.transition()
-				.duration(500)
-				.attr("transform", "translate(0, -100)")
+			onLeft
+				.transition()
+					.duration(500)
+					.attr("transform", "translate(0, -110)")
+
+			onRight
+				.transition()
+					.duration(500)
+					.attr("transform", "translate(0, -90)")
 	}
 
-	console.log("On the left side: " + numOfBallsOnLeft + ". On the right side: " + numOfBallsOnRight)
+	function levelUp(){
+			leftScales
+				.transition()
+					.duration(500)
+					.attr("transform", "translate(0, -100)")
+
+			rightScales
+				.transition()
+					.duration(500)
+					.attr("transform", "translate(0, -100)")
+
+			onLeft
+				.transition()
+					.duration(500)
+					.attr("transform", "translate(0, -100)")
+
+			onRight
+				.transition()
+					.duration(500)
+					.attr("transform", "translate(0, -100)")
+	}
+
+	if(numOfBallsOnLeft === numOfBallsOnRight){
+		if(inTheLeftScale){
+			skewLeft()
+		}
+		else if(inTheRightScale){
+			skewRight()
+		}
+		else{
+			levelUp()
+		}
+	} else if(numOfBallsOnLeft > numOfBallsOnRight){
+		skewLeft()
+	} else if (numOfBallsOnLeft < numOfBallsOnRight){
+		skewRight()
+	}
 }
 // ----------------------------------------------------------------------------------------------
 // -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -210,7 +245,7 @@ rightScales
     .enter()
     .append("polygon")
     .style("stroke", "#FFFCD3")
-    .style("fill", '"orange')
+    .style("fill", 'url(#copper)')
     .attr("points", (d) =>{ return d});
 
 var leftScalesCoordinartes = [[{x: 190, y:250}, {x: 270, y:250}, {x:260,y:260}, {x:200,y:260}]];
@@ -227,7 +262,36 @@ leftScales
     .enter()
     .append("polygon")
     .style("stroke", "#FFFCD3")
-    .style("fill", '"orange')
+    .style("fill", 'url(#copper)')
     .attr("points", (d) =>{ return d});
 //-----------------------------------------------------------------------------------------------
 // -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+//---------------------------------INFO BOARD-----------------------------------------------
+var message = ["Scales usages left:", "2"]
+
+var legend = svg.selectAll("text")
+		.data(message)
+		.enter()
+		.append("text")
+		.text(function(d){return d})
+		.attr('x', 600)
+		.attr('y', function(d, i){return 100 + i*20})
+		.style('fill', '#F6F6F6')
+//-----------------------------------------------------------------------------------------------
+// -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+//---------------------------------TRASH BIN-----------------------------------------------
+var bin =   svg
+  .append('image')
+//  .attr('d',path)
+  .attr('xlink:href','bin.png')
+  .attr('class', 'pico')
+  .attr('height', '100')
+  .attr('width', '100')
+  .attr('x', 450)
+  .attr('y', 200)
+//-----------------------------------------------------------------------------------------------
+// -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+
