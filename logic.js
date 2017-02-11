@@ -10,7 +10,7 @@ l__j   |____jl__j__jl_____j      l__j  l__j__jl_____j     \___/ l_____jl_____j  
 */
 
 // ----------------------------------- SVG and BACKGROUND --------------------------------------------
-var height = 300
+var height = 500
 var width = 800
 
 var svg = d3.select('body')
@@ -21,9 +21,29 @@ var svg = d3.select('body')
 var canvas = svg.append('rect')
 			.attr('width', '100%')
 			.attr('height', '100%')
-			.attr('fill', '#2B2B2B')
+			.attr('fill', '#4e83ab')
 // ----------------------------------------------------------------------------------------------
 // -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+//---------------------------------IMAGES-----------------------------------------------
+// var desk =   svg
+//   .append('image')
+//   .attr('xlink:href','desk.jpeg')
+//   .attr('height', '450')
+//   .attr('width', '800')
+//   .attr('x', -150)
+//   .attr('y', 100)
+
+ var bin =   svg
+  .append('image')
+  .attr('xlink:href','binBlueBG.jpg')
+  .attr('height', '80')
+  .attr('width', '80')
+  .attr('x', 715)
+  .attr('y', 340)
+//-----------------------------------------------------------------------------------------------
+// -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
 
 //---------------------------------GRADIENT COLORS-----------------------------------------------
 
@@ -32,50 +52,53 @@ var steel = defs.append("radialGradient").attr('id', 'metal')
 var copper = defs.append("radialGradient").attr('id', 'copper')
 
 steel.append("stop").attr("offset", "0%").style("stop-color", "white");
-steel.append("stop").attr("offset", "100%").style("stop-color", "#7b899b");
+steel.append("stop").attr("offset", "100%").style("stop-color", "#black");
 
-copper.append("stop").attr("offset", "0%").style("stop-color", "white");
-copper.append("stop").attr("offset", "100%").style("stop-color", "#b87333");
+copper.append("stop").attr("offset", "0%").style("stop-color", "#655a5a");
+copper.append("stop").attr("offset", "100%").style("stop-color", "gray");
 
 // ----------------------------------------------------------------------------------------------
 // -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 // -----------------------------------  BALLS --------------------------------------------
-var balls = [{0: false},{1: false},{2: false},{3: false},
-				{4: false}, {5: false}, {6: false}, {7: false},
-				{8: false}]
+var balls = [{id: 0, odd:false},{id:1, odd:false},{id:2, odd:false},
+    {id:3, odd:false}, {id:4, odd:false}, {id:5, odd:false},
+    {id:6, odd:false}, {id:7, odd:false},{id:8, odd:false}];
 
 var odd = parseInt(Math.random()*9)
 
-balls[odd][odd] = true
+balls[odd]['odd'] = true
 
 var svgBalls = svg
 			.selectAll('circle')
 			.data(balls)
 			.enter()
 			.append('circle')
-			.attr('r', 10)
-			// make all colors the same after testing -----!!!!!!!
-			.attr('fill', function(d, i){
-				return d[i] ? 'yellow' : 'url(#metal)'
-			})
+			.attr('r', 15)
+			// make all balls the same colors after testing -----!!!!!!!
+			.attr('fill', 'url(#metal)')
+			// 	function(d, i){
+			// 	return d['odd'] ? 'yellow' :
+			// })
 
 svgBalls
 		    .call(d3.drag()
 		        .on("start", dragstarted)
 		        .on("drag", dragged)
 		        .on("end", dragended));
+
+
 // ----------------------------------------------------------------------------------------------
 // -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 // ----------------------------------- SIMULATION --------------------------------------------
 var simulation = d3.forceSimulation(balls)
-			.force("collide", d3.forceCollide().radius(10))
-			.force('y', d3.forceY(250).strength(0.3))
+			.force("collide", d3.forceCollide().radius(16))
+			.force('y', d3.forceY(400).strength(0.555))
 
 var ticked = function() {
      svgBalls
-     	.attr("cx", function(d){ return d.x + 100;})
+     	.attr("cx", function(d, i){ return d.x + 180;})
         .attr("cy", function(d){ return d.y;})
 }
 
@@ -89,44 +112,67 @@ simulation
 function dragstarted(d) {
 	simulation.restart();
     simulation.alpha(1.0);
-	d3.select(this)
-		.raise()
-		.classed("active", true);
+	// d3.select(this)
+	// 	.raise()
+	// 	.classed("active", true);
 }
 
-function dragged(d) {
+function dragged(d, i) {
   d3.select(this)
   	.attr("cx", d.x = d3.event.x)
   	.attr("cy", d.y = d3.event.y);
 }
 
-function dragended(d) {
+function dragended(d, i) {
 
-	d3.select(this)
-		.classed("active", false);
+	console.log(d)
+	// d3.select(this)
+	// 	.classed("active", false);
+	// console.log("Before remove: :", balls)
+
+	if(d.x > 480){
+		balls = balls.filter(d => d.id != i);
+
+		var update = svg.selectAll('circle')
+			.data(balls, d => d.id)
+			.attr('fill', function(d, i){
+				return d['odd'] ? 'yellow' : 'url(#metal)'
+			})
+
+		update
+			.exit()
+			.transition()
+			.duration(100)
+			.remove()
+	}
+
+
 	simulation.alphaTarget(0.1);
+	// console.log("After remove: :", balls)
 }
 // ----------------------------------------------------------------------------------------------
 // -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 // ----------------------------------- USING SCALES --------------------------------------------
+var numOfBallsOnLeft = 0;
+var numOfBallsOnRight = 0;
+
 function useScales(){
-	message[1] = parseInt(message[1])-1;
-	legend.data(message).text(function(d){return d;})
+	message[1]['text'] = parseInt(message[1]['text'])-1;
+	legend.data(message).text(function(d){return d.text;})
 
 	var text = d3.selectAll('text').data(message)
-	console.log(parseInt(message[1]))
+	console.log(parseInt(message[1]['text']))
 	var inTheRightScale = false;
 	var inTheLeftScale = false;
 
-	var numOfBallsOnLeft = 0;
-	var numOfBallsOnRight = 0;
+
 
 	var onLeft = svgBalls
 			.filter(function(d, i){
 				if(d.x > 100 && d.x < 180){
 					numOfBallsOnLeft ++
-					if(d[i] === true){
+					if(d['odd'] === true){
 						inTheLeftScale = true
 					}
 				}
@@ -137,7 +183,7 @@ function useScales(){
 			.filter(function(d, i){
 				if(d.x > 240 && d.x < 320){
 					numOfBallsOnRight ++
-					if(d[i] === true){
+					if(d['odd'] === true){
 						inTheRightScale = true
 					}
 				}
@@ -147,68 +193,68 @@ function useScales(){
 	function skewLeft(){
 			leftScales
 				.transition()
-					.duration(500)
-					.attr("transform", "translate(0, -90)")
+					.duration(1000)
+					.attr("transform", "translate(0, -40)")
 
 			rightScales
 				.transition()
-					.duration(500)
-					.attr("transform", "translate(0, -110)")
+					.duration(1000)
+					.attr("transform", "translate(0, -60)")
 
 			onLeft
 				.transition()
-					.duration(500)
-					.attr("transform", "translate(0, -90)")
+					.duration(1000)
+					.attr("transform", "translate(0, -40)")
 
 			onRight
 				.transition()
-					.duration(500)
-					.attr("transform", "translate(0, -110)")
+					.duration(1000)
+					.attr("transform", "translate(0, -60)")
 
 	}
 
 	function skewRight(){
 			leftScales
 				.transition()
-					.duration(500)
-					.attr("transform", "translate(0, -110)")
+					.duration(1000)
+					.attr("transform", "translate(0, -60)")
 
 			rightScales
 				.transition()
-					.duration(500)
-					.attr("transform", "translate(0, -90)")
+					.duration(1000)
+					.attr("transform", "translate(0, -40)")
 
 			onLeft
 				.transition()
-					.duration(500)
-					.attr("transform", "translate(0, -110)")
+					.duration(1000)
+					.attr("transform", "translate(0, -60)")
 
 			onRight
 				.transition()
-					.duration(500)
-					.attr("transform", "translate(0, -90)")
+					.duration(1000)
+					.attr("transform", "translate(0, -40)")
 	}
 
 	function levelUp(){
 			leftScales
 				.transition()
-					.duration(500)
-					.attr("transform", "translate(0, -100)")
+					.duration(1000)
+					.attr("transform", "translate(0, -50)")
 
 			rightScales
 				.transition()
-					.duration(500)
-					.attr("transform", "translate(0, -100)")
+					.duration(1000)
+					.attr("transform", "translate(0, -50)")
 
 			onLeft
 				.transition()
-					.duration(500)
-					.attr("transform", "translate(0, -100)")
+					.duration(1000)
+					.attr("transform", "translate(0, -50)")
 
 			onRight
 				.transition()
-					.duration(500)
-					.attr("transform", "translate(0, -100)")
+					.duration(1000)
+					.attr("transform", "translate(0, -50)")
 	}
 
 	if(numOfBallsOnLeft === numOfBallsOnRight){
@@ -231,67 +277,88 @@ function useScales(){
 // -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 //---------------------------------DRAWING SCALES -----------------------------------------------
-var rightScalesCoordinartes = [[{x: 340, y:250}, {x: 420, y:250}, {x:410,y:260}, {x:350,y:260}]];
-
-var d3DataRightScales = rightScalesCoordinartes.map(function(point){
-    return point.reduce(function(s, n){return s + ', ' + n.x + ',' + n.y}, '').substr(2)
-});
-
 var rightScales = svg.append('g')
-
-rightScales
-	.selectAll("polygon")
-    .data(d3DataRightScales)
-    .enter()
-    .append("polygon")
-    .style("stroke", "#FFFCD3")
-    .style("fill", 'url(#copper)')
-    .attr("points", (d) =>{ return d});
-
-var leftScalesCoordinartes = [[{x: 190, y:250}, {x: 270, y:250}, {x:260,y:260}, {x:200,y:260}]];
-
-var d3DataLeftScales = leftScalesCoordinartes.map(function(point){
-    return point.reduce(function(s, n){return s + ', ' + n.x + ',' + n.y}, '').substr(2)
-});
-
 var leftScales = svg.append('g')
+function drawScales(){
+	var rightScalesCoordinartes = [[{x: 550, y:410}, {x: 710, y:410}, {x:690,y:420}, {x:570,y:420}]];
 
-leftScales
-	.selectAll("polygon")
-    .data(d3DataLeftScales)
-    .enter()
-    .append("polygon")
-    .style("stroke", "#FFFCD3")
-    .style("fill", 'url(#copper)')
-    .attr("points", (d) =>{ return d});
+	var d3DataRightScales = rightScalesCoordinartes.map(function(point){
+	    return point.reduce(function(s, n){return s + ', ' + n.x + ',' + n.y}, '').substr(2)
+	});
+
+	rightScales
+		.selectAll("polygon")
+	    .data(d3DataRightScales)
+	    .enter()
+	    .append("polygon")
+	    .style("stroke", "#383434")
+	    .style("fill", 'url(#copper)')
+	    .attr("points", (d) =>{ return d});
+
+	var leftScalesCoordinartes = [[{x: 340, y:410}, {x: 510, y:410}, {x:490,y:420}, {x:360,y:420}]];
+
+	var d3DataLeftScales = leftScalesCoordinartes.map(function(point){
+	    return point.reduce(function(s, n){return s + ', ' + n.x + ',' + n.y}, '').substr(2)
+	});
+
+
+
+	leftScales
+		.selectAll("polygon")
+	    .data(d3DataLeftScales)
+	    .enter()
+	    .append("polygon")
+	    .style("stroke", "#383434")
+	    .style("fill", 'url(#copper)')
+	    .attr("points", (d) =>{ return d});
+}
+drawScales()
 //-----------------------------------------------------------------------------------------------
 // -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 //---------------------------------INFO BOARD-----------------------------------------------
-var message = ["Scales usages left:", "2"]
+var message = [{text:"SCALES USAGES LEFT:", x: 50, y: 50, size: 30, fill: "#cc0000"},
+				{text: "2", x: 320, y: 50, size: 35, fill: "#cc0000"},
+				{text: 'left side', x: 300, y: 90, size: 25, fill: 'black'},
+				{text: 'right side', x: 450, y: 90, size: 25, fill: 'black'},
+				{text: 'sorted out', x: 600, y: 90, size: 25, fill: 'black'},
+				{text: 'first usage stats: ', x: 80, y: 120, size: 25, fill: 'black'},
+				{text: 'second usage stats: ', x: 80, y: 170, size: 25, fill: 'black'},
+				{text: numOfBallsOnLeft, x: 320, y: 120, size: 25, fill: 'black'},
+				{text: numOfBallsOnRight, x: 470, y: 120, size: 25, fill: 'black'},
+				{text: 'second usage stats: ', x: 80, y: 170, size: 25, fill: 'black'},
+				{text: 'second usage stats: ', x: 80, y: 170, size: 25, fill: 'black'},
+				]
+
 
 var legend = svg.selectAll("text")
 		.data(message)
 		.enter()
 		.append("text")
-		.text(function(d){return d})
-		.attr('x', 600)
-		.attr('y', function(d, i){return 100 + i*20})
-		.style('fill', '#F6F6F6')
+		.text(function(d){return d.text})
+		.attr('x', d => d.x)
+		.attr('y', d => d.y)
+		.attr('font-size', d => d.size)
+		.attr('fill', d => d.fill)
+
 //-----------------------------------------------------------------------------------------------
 // -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-//---------------------------------TRASH BIN-----------------------------------------------
-var bin =   svg
-  .append('image')
-//  .attr('d',path)
-  .attr('xlink:href','bin.png')
-  .attr('class', 'pico')
-  .attr('height', '100')
-  .attr('width', '100')
-  .attr('x', 450)
-  .attr('y', 200)
+//---------------------------------STEP 2-----------------------------------------------
+function readyForStepTwo(){
+	console.log('almost ready')
+
+	svg.selectAll('circle')
+		.filter(d => d.x > 100)
+		.attr('cx', function(d){
+			d.x = Math.random()*30
+		})
+		.attr('transform', 'translate(0, 0)')
+
+	leftScales.attr('transform', 'translate(0, 0)')
+
+	rightScales.attr('transform', 'translate(0, 0)')
+}
 //-----------------------------------------------------------------------------------------------
 // -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
 
