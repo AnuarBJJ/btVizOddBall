@@ -10,7 +10,7 @@ l__j   |____jl__j__jl_____j      l__j  l__j__jl_____j     \___/ l_____jl_____j  
 */
 
 // precautiously removing event listener for click
-// document.removeEventListener('click', pick)
+document.removeEventListener('click', guess)
 
 // ----------------------------------- SVG and BACKGROUND --------------------------------------------
 var height = 500
@@ -214,7 +214,7 @@ function useScales(numOfBallsOnLeft, numOfBallsOnRight){
 	var inTheRightScale = false;
 	var inTheLeftScale = false;
 
-	var onLeft = svgBalls
+	var onLeft = svg.selectAll('circle')
 			.filter(function(d, i){
 				if(d.x > leftScalesLeftSide-shiftRight && d.x < leftScalesRigthSide-shiftRight){
 					numOfBallsOnLeft ++
@@ -225,7 +225,7 @@ function useScales(numOfBallsOnLeft, numOfBallsOnRight){
 				return d.x > leftScalesLeftSide-shiftRight && d.x < leftScalesRigthSide-shiftRight
 			})
 
-	var onRight = svgBalls
+	var onRight = svg.selectAll('circle')
 			.filter(function(d, i){
 				if(d.x > rightScalesLeftSide-shiftRight && d.x < rightScalesRigthSide-shiftRight){
 					numOfBallsOnRight ++
@@ -454,18 +454,4 @@ function guess(e) {
 		} else if(target.tagName === 'circle') {
 			alert('It was supposed to be 100% probability')
 		}
-	    // console.log(target)
 }
-// var target
-
-// document.addEventListener('click', function(e) {
-//     e = e || window.event;
-//     target = e.target || e.srcElement
-//         // text = target.textContent || text.innerText;
-
-//     console.log(target)
-// }, false);
-
-
-
-// console.log("the winner", theWinner)
