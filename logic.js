@@ -9,6 +9,9 @@ l__j   |____jl__j__jl_____j      l__j  l__j__jl_____j     \___/ l_____jl_____j  
 
 */
 
+// precautiously removing event listener for click
+// document.removeEventListener('click', pick)
+
 // ----------------------------------- SVG and BACKGROUND --------------------------------------------
 var height = 500
 var width = 800
@@ -115,6 +118,7 @@ var svgBalls = svg
 			.attr('r', 15)
 			// make all balls the same colors after testing -----!!!!!!!
 			.attr('fill', 'url(#metal)')
+			.attr('id', d=>d.id)
 			// 	function(d, i){
 			// 	return d['odd'] ? 'yellow' :
 			// })
@@ -164,8 +168,6 @@ function dragged(d, i) {
 }
 
 function dragended(d, i) {
-
-	console.log(d)
 	// d3.select(this)
 	// 	.classed("active", false);
 	// console.log("Before remove: :", balls)
@@ -175,9 +177,10 @@ function dragended(d, i) {
 
 		var update = svg.selectAll('circle')
 			.data(balls, d => d.id)
-			.attr('fill', function(d, i){
-				return d['odd'] ? 'yellow' : 'url(#metal)'
-			})
+			.attr('fill', 'url(#metal)')
+				// function(d, i){
+			// 	return d['odd'] ? 'yellow' : 'url(#metal)'
+			// })
 
 		update
 			.exit()
@@ -302,6 +305,7 @@ function useScales(numOfBallsOnLeft, numOfBallsOnRight){
 
 
 	console.log(numOfBallsOnLeft, numOfBallsOnRight)
+
 	if(numOfBallsOnLeft === numOfBallsOnRight){
 		if(inTheLeftScale){
 			skewLeft()
@@ -330,7 +334,7 @@ function useScales(numOfBallsOnLeft, numOfBallsOnRight){
 	if(parseInt(message[1]['text']) === 1){
 		setTimeout(function(){ alert("Toss non-odd balls in the bin."); }, 1000);
 
-		document.getElementById('step2').style.visibility = 'visible'
+		document.getElementById('step2').style.visibility = 'hidden'
 		document.getElementById('use').style.visibility = 'hidden'
 
 		message[9]['text'] = numOfBallsOnLeft
@@ -415,7 +419,6 @@ drawScales()
 
 //---------------------------------STEP 2-----------------------------------------------
 function readyForStepTwo(){
-	console.log('almost ready')
 
 	document.getElementById('use').style.visibility = 'visible'
 	document.getElementById('step2').style.visibility = 'hidden'
@@ -433,4 +436,36 @@ function readyForStepTwo(){
 }
 //-----------------------------------------------------------------------------------------------
 // -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+function pick(){
+	var target;
+	document.addEventListener('click', guess)
+}
 
+function guess(e) {
+	    e = e || window.event;
+	    var target = e.target || e.srcElement
+		if(target){
+			console.log(target.tagName)
+		}
+
+		var theChosenOne = document.getElementById(odd);
+		if(theChosenOne === target){
+			alert('Lucky you')
+		} else if(target.tagName === 'circle') {
+			alert('It was supposed to be 100% probability')
+		}
+	    // console.log(target)
+}
+// var target
+
+// document.addEventListener('click', function(e) {
+//     e = e || window.event;
+//     target = e.target || e.srcElement
+//         // text = target.textContent || text.innerText;
+
+//     console.log(target)
+// }, false);
+
+
+
+// console.log("the winner", theWinner)
